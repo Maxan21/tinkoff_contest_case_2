@@ -1,0 +1,241 @@
+openapi: 3.0.0
+info:
+  title: Integration with "Avito" OpenAPI specification
+  version: 0.0.1
+paths:
+  /Salesman/Information/{phone number}/{name}:
+    post:
+      summary: Create buyer
+      tags:
+        - Salesman
+      parameters: 
+        - name: phone number
+          in: path
+          required: true
+          description: phone number
+          schema: 
+            type: integer
+            example: 88005553535
+        - name: name
+          in: path
+          required: true
+          description: name
+          schema: 
+            type: string
+            example: "Иванов Иван Иваныч"
+      requestBody:
+        required: true
+        content:
+          application/json: 
+            schema:
+              $ref: "#/components/schemas/Salesman"
+      responses:  
+        "200":
+          description: продавец внесен в базу, id создан
+        "409":
+          description: Такой продавец уже есть в базе
+  /Buyer/Information/{phone number}/{name}:
+    post:
+      summary: Create buyer
+      tags:
+        - Buyers
+      parameters: 
+        - name: phone number
+          in: path
+          required: true
+          description: phone number
+          schema: 
+            type: integer
+            example: 88005553535
+        - name: name
+          in: path
+          required: true
+          description: name
+          schema: 
+            type: string
+            example: "Иванов Иван Иваныч"
+      requestBody:
+        required: true
+        content:
+          application/json: 
+            schema:
+              $ref: "#/components/schemas/Buyer"
+      responses:  
+        "200":
+          description: покупатель внесен в базу, id создан
+        "409":
+          description: Такой покупатель уже есть в базе
+      
+    
+  
+  /Deal/Create/{buyer_id}/{salesman_id}/{product}/{sum}/{status}:
+    post:
+      summary: Create deal
+      tags:
+        - Deals
+      parameters: 
+        - name: buyer_id
+          in: path
+          required: true
+          description: buyer id
+          schema: 
+            type: integer
+            example: 1234567890
+        - name: salesman_id
+          in: path
+          required: true
+          description: salesman id
+          schema: 
+            type: integer
+            example: 1234567890
+        - name: product
+          in: path
+          required: true
+          description: product
+          schema: 
+            type: string
+            example: "toy"
+        - name: sum
+          in: path
+          required: true
+          description: product
+          schema: 
+            type: integer
+            example: 1234.3
+      requestBody:
+        required: true
+        content:
+          application/json: 
+            schema:
+              $ref: "#/components/schemas/Deal"
+      responses:  
+        "200":
+          description: Сделка открыта
+        "409":
+          description: Такая сделка уже есть в базе
+  /Deal/GetDealStatus/{deal_id}:
+    get:
+      tags: 
+        - Deals
+      summary: Check Status
+      description: Сheck if the status has changed
+      operationId: checkstatus
+      parameters:
+        - name: deal_id
+          in: path
+          required: true
+          description: deal id
+          schema: 
+            type: integer
+            example: 1234567
+      responses: 
+        "200":
+          description: check status 
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Status"
+    
+  /Deals/{deal_id}/{status}:
+    put:
+      summary: update status
+      tags: 
+        - Deals
+      operationId: updateStatus
+      parameters: 
+        - name: deal_id
+          in: path
+          required: true
+          description: buyer id
+          schema: 
+            type: integer
+            example: 1234567890
+        - name: status
+          in: path
+          required: true
+          description: status 
+          schema: 
+            type: string
+            enum:
+              - "waiting for payment"
+              - "completed"
+              - "refund to the buyer"
+      requestBody:
+        description: Изменение статуса
+        content:
+          application/json: 
+            schema:
+              $ref: "#/components/schemas/Status"
+      responses:
+        "200":
+          description: Статус успешно изменен
+          content:
+            application/json: 
+              schema:
+                $ref: "#/components/schemas/Status"
+        "404":
+          description: Сделка с таким id не найдена
+      
+  /Deals/Delete/{deal_id}:
+    delete:
+      summary: Canceling a deal
+      tags:
+        - Deals
+      parameters: 
+        - name: deal_id
+          in: path
+          required: true
+          description: deal id
+          schema: 
+            type: integer
+            example: 1234567
+      responses:  
+        "200":
+          description: deal canceled
+          content:
+            application/json: {}
+components:
+  schemas:
+    Deal:
+      type: object
+      required:
+        - deal_id
+      properties: 
+        deal_id:
+          type: integer
+          example: 1234567
+        status:
+          type: string
+          example: "waiting for payment"
+    Buyer:
+      type: object
+      required:
+        - buyer_id
+      properties: 
+        buyer_id:
+          type: integer
+          example: 1234567890
+    Salesman:
+      type: object
+      required:
+        - salesman_id
+      properties: 
+        salesman_id:
+          type: integer
+          example: 1234567890
+    Status:
+      type: object
+      required:
+        - status
+      properties: 
+        status:
+          type: string
+          enum:
+              - "waiting for payment"
+              - "completed"
+              - "refund to the buyer"
+    
+          
+        
+          
+  
